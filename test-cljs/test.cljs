@@ -33,7 +33,9 @@
 
   (assert_unify [[B A] [B A]] [[B A]])
 
-  ; (assert_unify [[(f A) (f b)]] [[A b]])
+  (assert_unify [[(f A) (f b)]] [[A b]])
+  (assert_unify [[(f A) (f b b)]] nil)
+  (assert_unify [[(f A B) (f b a)]] [[B a] [A b]])
   )
 
 (defn -main []
