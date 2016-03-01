@@ -10,4 +10,4 @@ Get some insight about how prolog works
   * To just compile sources `lein cljsbuild once` or for continuous compilation `lein cljsbuild auto`
 * Open [http://localhost:8000](http://localhost:8000/) to open files from `./site`
 * Run clojure scripts tests `lein cljsbuild test`
-
+  * Continuous running tests `ls -d out/* | entr node test-cljs/runner.js` together with `lein cljsbuild auto`

@@ -37,8 +37,9 @@
   )
 
 (defn -main []
-  (.log js/console "insight-prolog tests started.")
+  (.log js/console "\n\ninsight-prolog tests started.")
   (core-test)
+  (.log js/console "insight-prolog tests finished.\n\n")
   success)
 
 (set! *main-cli-fn* -main)

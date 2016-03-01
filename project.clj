@@ -16,7 +16,7 @@
 
   :cljsbuild {
     :test-commands {
-      "unit" ["node" "site/javascripts/unit-test.js"] }
+      "unit" ["node" "test-cljs/runner.js"] }
 
     :builds {
       :dev {
@@ -29,10 +29,11 @@
       :test {
         :source-paths ["src-cljs" "test-cljs"]
         :compiler {
-            :output-to "site/javascripts/unit-test.js"
-            :optimizations :simple
+            :output-to "out/unit-test.js"
+            :output-dir "out"
+            :optimizations :none
             :pretty-print true
             :target :nodejs}}
       }}
 
-  :clean-targets ^{:protect false} ["site/javascripts" :target-path])
+  :clean-targets ^{:protect false} ["out" "site/javascripts" :target-path])

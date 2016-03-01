@@ -1,2 +1,6 @@
 site/javascripts
 target
+node_modules
+.lein-failures
+.lein-repl-history
+out
