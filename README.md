@@ -4,9 +4,10 @@ Get some insight about how prolog works
 
 # Develop
 
-* Install http://leiningen.org/
+* Install [leiningen](http://leiningen.org/)
 * Install dependencies `lein deps`
-* Compile sources `lein cljsbuild once` or for continuous compilation `lein cljsbuild auto`
+* To compile and start a server for static assets `lein cooper`.
+  * To just compile sources `lein cljsbuild once` or for continuous compilation `lein cljsbuild auto`
+* Open [http://localhost:8000](http://localhost:8000/) to open files from `./site`
 * Run clojure scripts tests `lein cljsbuild test`
-* Open pages with a static file server or directly form `./build/`
 

@@ -5,9 +5,14 @@
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.7.228"]]
 
-  :plugins [[lein-cljsbuild "1.1.2"]]
+  :plugins [[lein-cljsbuild "1.1.2"]
+            [lein-simpleton "1.3.0"]
+            [lein-cooper "1.2.1"]]
 
   :hooks [leiningen.cljsbuild]
+
+  :cooper {"cljs" ["lein" "cljsbuild" "auto"]
+           "web"  ["lein" "simpleton" "8000" "file" ":from" "site"]}
 
   :cljsbuild {
     :test-commands {
