@@ -11,13 +11,10 @@
 
 (defmulti subst (fn [term substs] [(type term)]))
 
-(defmethod subst [EmptyList] [_ _]
-  [])
-
-(defmethod subst [IndexedSeq] [s substs]
+(defmethod subst [PersistentVector] [s substs]
   (mapv (fn [arg] (subst arg substs)) s))
 
-(defmethod subst [PersistentVector] [s substs]
+(defmethod subst [ISeq] [s substs]
   (mapv (fn [arg] (subst arg substs)) s))
 
 (defmethod subst [PAtom] [a _]
