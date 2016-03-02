@@ -23,6 +23,9 @@
   (assert (= (c/subst (f A B) [[B A]]) (f A A)))
   (assert (= (c/subst a [[B A]]) a))
 
+  (assert (= (c/vars B) #{B}))
+  (assert (= (c/vars (f A B)) #{A B}))
+
   (assert_unify [[a a]] [])
   (assert_unify [[a b]] nil)
   (assert_unify [[A b]] [[A b]])
@@ -36,6 +39,10 @@
   (assert_unify [[(f A) (f b)]] [[A b]])
   (assert_unify [[(f A) (f b b)]] nil)
   (assert_unify [[(f A B) (f b a)]] [[B a] [A b]])
+  (assert_unify [[(f (f A)) (f B)]] [[B (f A)]])
+  (assert_unify [[(f A) (g B)]] nil)
+  (assert_unify [[(f (f A)) (f A)]] nil) ; occurs check
+  (assert_unify [[(f A) (f (f A))]] nil) ; occurs check
   )
 
 (defn -main []
