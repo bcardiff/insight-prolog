@@ -3,7 +3,8 @@
   :url "http://github.com/bcardiff/insight-prolog"
 
   :dependencies [[org.clojure/clojure "1.8.0"]
-                 [org.clojure/clojurescript "1.7.228"]]
+                 [org.clojure/clojurescript "1.7.228"]
+                 [com.lucasbradstreet/instaparse-cljs "1.4.1.0"]]
 
   :plugins [[lein-cljsbuild "1.1.2"]
             [lein-simpleton "1.3.0"]

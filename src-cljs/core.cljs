@@ -1,4 +1,5 @@
-(ns insight-prolog.core)
+(ns insight-prolog.core
+  (:require [instaparse.core :as insta]))
 
 (enable-console-print!)
 
@@ -8,6 +9,32 @@
 (defrecord PAtom [name]) ; Atoms
 (defrecord PVar [name]) ; Variables
 (defrecord PFun [name args]); Functions
+
+(defrecord PRule [lhs rhs]); Functions
+
+
+(def grammar
+  (insta/parser
+    "<S> = rule*
+     rule = clause <'.'>
+     <clause> = term
+     <term> = var | atom | fun
+     fun = atom_ident <'('> comma_term <')'>
+     <comma_term> = term (<','> comma_term)?
+     atom = atom_ident
+     var = var_indent
+
+     <atom_ident> = #'[a-z]+'
+     <var_indent> = #'[A-Z]+'
+     "))
+
+(defn parse [str]
+  (insta/transform {
+    :atom (fn [ident] (PAtom. ident))
+    :var (fn [ident] (PVar. ident))
+    :fun  (fn [name & args] (PFun. name args))
+    :rule (fn [lhs] (PRule. lhs []))
+    } (grammar str)))
 
 (defmulti subst (fn [term substs] [(type term)]))
 

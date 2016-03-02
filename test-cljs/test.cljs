@@ -3,6 +3,9 @@
 
 (def success 0)
 
+(defn i [a] (println a) a)
+
+
 (def A (c/PVar. "A"))
 (def B (c/PVar. "B"))
 (def a (c/PAtom. "a"))
@@ -11,6 +14,7 @@
 (defn g [& args] (c/PFun. "g" args))
 
 (defn assert_unify [terms s] (assert (= (c/unify terms) s)))
+(defn assert_axiom [input exp] (assert (= (:lhs (first (c/parse input))) exp)))
 
 (defn core-test []
   (assert (= (c/lorem) "ipsum!!!"))
@@ -43,6 +47,12 @@
   (assert_unify [[(f A) (g B)]] nil)
   (assert_unify [[(f (f A)) (f A)]] nil) ; occurs check
   (assert_unify [[(f A) (f (f A))]] nil) ; occurs check
+
+  (assert_axiom "a." a)
+  (assert_axiom "b." b)
+  (assert_axiom "f(a)." (f a))
+  (assert_axiom "f(a,b)." (f a b))
+  (assert_axiom "f(A)." (f A))
   )
 
 (defn -main []
