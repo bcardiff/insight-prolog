@@ -34,6 +34,10 @@
 (defmethod vars PVar [a] #{a})
 (defmethod vars PFun [f] (set (flatten (map seq (map vars (:args f))))) )
 
+(defn unify_vars [v other g]
+  (if ((vars other) v)
+    nil
+    (cons [v other] (unify (subst g [[v other]])))))
 
 (defn unify [terms]
   (if (empty? terms)
@@ -55,7 +59,3 @@
                   ))))
           ))))))
 
-(defn unify_vars [v other g]
-  (if ((vars other) v)
-    nil
-    (cons [v other] (unify (subst g [[v other]])))))
