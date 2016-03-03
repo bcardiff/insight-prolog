@@ -16,18 +16,20 @@
 
 (deftest core-test
   (assert (= (c/lorem) "ipsum!!!"))
-
   (assert (= (:name A)  "A"))
-  (assert (= (:name a)  "a"))
+  (assert (= (:name a)  "a")))
 
+(deftest core-subst
   (assert (= (c/subst A []) A))
   (assert (= (c/subst (f A) [[A b]]) (f b)))
   (assert (= (c/subst (f A B) [[B A]]) (f A A)))
-  (assert (= (c/subst a [[B A]]) a))
+  (assert (= (c/subst a [[B A]]) a)))
 
+(deftest core-vars
   (assert (= (c/vars B) #{B}))
-  (assert (= (c/vars (f A B)) #{A B}))
+  (assert (= (c/vars (f A B)) #{A B})))
 
+(deftest core-unify
   (assert_unify [[a a]] [])
   (assert_unify [[a b]] nil)
   (assert_unify [[A b]] [[A b]])
@@ -45,7 +47,9 @@
   (assert_unify [[(f A) (g B)]] nil)
   (assert_unify [[(f (f A)) (f A)]] nil) ; occurs check
   (assert_unify [[(f A) (f (f A))]] nil) ; occurs check
+  )
 
+(deftest core-parse
   (assert_axiom "a." a)
   (assert_axiom "b." b)
   (assert_axiom "f(a)." (f a))
