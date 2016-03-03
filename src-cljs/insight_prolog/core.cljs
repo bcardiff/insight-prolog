@@ -6,19 +6,22 @@
 (defn ^:export lorem []
   "ipsum!!!")
 
-(defrecord PAtom [name]) ; Atoms
-(defrecord PVar [name]) ; Variables
+(defrecord PAtom [name])    ; Atoms
+(defrecord PVar [name])     ; Variables
 (defrecord PFun [name args]); Functions
 
-(defrecord PRule [lhs rhs]); Functions
+(defrecord PRule [lhs rhs]) ; Rules
 
 
 (def grammar
   (insta/parser
-    "<S> = rule*
-     rule = clause <'.'>
+    "<S> = (<whitespace>? | axiom | rule)*
+     axiom = clause <'.'>
+     rule = clause <':-'> comma_clause <'.'>
+     <comma_clause> = clause (<','> comma_clause)?
+
      <clause> = term
-     <term> = var | atom | fun
+     <term> = <whitespace>? ( var | atom | fun ) <whitespace>?
      fun = atom_ident <'('> comma_term <')'>
      <comma_term> = term (<','> comma_term)?
      atom = atom_ident
@@ -26,6 +29,8 @@
 
      <atom_ident> = #'[a-z]+'
      <var_indent> = #'[A-Z]+'
+
+     whitespace = #'\\s+'
      "))
 
 (defn parse [str]
@@ -33,7 +38,8 @@
     :atom (fn [ident] (PAtom. ident))
     :var (fn [ident] (PVar. ident))
     :fun  (fn [name & args] (PFun. name args))
-    :rule (fn [lhs] (PRule. lhs []))
+    :axiom (fn [lhs] (PRule. lhs []))
+    :rule (fn [lhs & rhs] (PRule. lhs rhs))
     } (grammar str)))
 
 (defmulti subst (fn [term substs] [(type term)]))

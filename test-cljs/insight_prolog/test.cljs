@@ -1,6 +1,7 @@
 (ns insight-prolog.test
   (:require [insight-prolog.core :as c]
-            [cljs.test :refer-macros [deftest is]]))
+            [cljs.test :refer-macros [deftest is]]
+            [instaparse.core :as insta] ))
 
 (defn i [a] (println a) a)
 
@@ -12,7 +13,15 @@
 (defn g [& args] (c/PFun. "g" args))
 
 (defn assert_unify [terms s] (is (= (c/unify terms) s)))
-(defn assert_axiom [input exp] (is (= (:lhs (first (c/parse input))) exp)))
+(defn assert_parse [input]
+  (let [r (c/parse input)]
+    (is (= false (insta/failure? r)) (insta/get-failure r)) r))
+(defn assert_axiom [input lhs] (is (= (:lhs (first (assert_parse input))) lhs)))
+(defn assert_rule [input lhs rhs]
+  (let [p (assert_parse input)]
+    (is (= (:lhs (first p)) lhs))
+    (is (= (:rhs (first p)) rhs)))
+    )
 
 (deftest core-test
   (assert (= (c/lorem) "ipsum!!!"))
@@ -55,5 +64,18 @@
   (assert_axiom "f(a)." (f a))
   (assert_axiom "f(a,b)." (f a b))
   (assert_axiom "f(A)." (f A))
+  (assert_rule "f(A):-g(A)." (f A) [(g A)])
+  (assert_rule "f(A):-f(B),g(B,A)." (f A) [(f B) (g B A)])
+  (assert_rule "   f( A ) :-   f( B ),
+               g( B , A )   ." (f A) [(f B) (g B A)])
+
+  (is (= (assert_parse "
+                       f(a).
+                       f(f(B)) :- f(B).
+                       ")
+         [
+          (c/PRule. (f a) [])
+          (c/PRule. (f (f B)) [(f B)])
+          ]))
   )
 
