@@ -1,10 +1,8 @@
 (ns insight-prolog.test
-  (:require [insight-prolog.core :as c]))
-
-(def success 0)
+  (:require [insight-prolog.core :as c]
+            [cljs.test :refer-macros [deftest is]]))
 
 (defn i [a] (println a) a)
-
 
 (def A (c/PVar. "A"))
 (def B (c/PVar. "B"))
@@ -13,10 +11,10 @@
 (defn f [& args] (c/PFun. "f" args))
 (defn g [& args] (c/PFun. "g" args))
 
-(defn assert_unify [terms s] (assert (= (c/unify terms) s)))
-(defn assert_axiom [input exp] (assert (= (:lhs (first (c/parse input))) exp)))
+(defn assert_unify [terms s] (is (= (c/unify terms) s)))
+(defn assert_axiom [input exp] (is (= (:lhs (first (c/parse input))) exp)))
 
-(defn core-test []
+(deftest core-test
   (assert (= (c/lorem) "ipsum!!!"))
 
   (assert (= (:name A)  "A"))
@@ -55,10 +53,3 @@
   (assert_axiom "f(A)." (f A))
   )
 
-(defn -main []
-  (.log js/console "\n\ninsight-prolog tests started.")
-  (core-test)
-  (.log js/console "insight-prolog tests finished.\n\n")
-  success)
-
-(set! *main-cli-fn* -main)
