@@ -119,3 +119,16 @@
 (defn prepare-program [input]
   (PRuntime. (parse input) 0))
 
+(defn one-step [runtime goal]
+  (let [rules (filter (partial is-candidate-rule goal) (:program runtime))]
+    [(map-indexed (fn [index rule]
+                    (let [i (+ index (:incarnation runtime) 1)
+                          rule-i (rule-incarnation rule i)
+                          mgu (unify [[(first goal) (:lhs rule-i)]])]
+
+                      (if (nil? mgu)
+                        nil
+                        [mgu (concat (subst (rest goal) mgu) (subst (:rhs rule-i) mgu))]
+                        )
+                      )) rules) (+ (:incarnation runtime) (count rules))]
+  ))

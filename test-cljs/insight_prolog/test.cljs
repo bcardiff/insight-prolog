@@ -6,6 +6,7 @@
 (defn i [a] (println a) a)
 
 (def A (c/PVar. "A"))
+(def A_1 (c/PVar. "A₁"))
 (def A_2 (c/PVar. "A₂"))
 (def B (c/PVar. "B"))
 (def B_2 (c/PVar. "B₂"))
@@ -102,3 +103,17 @@
   (is (not (c/is-candidate-rule [(f a)] (c/PRule. (g a) []))))
   )
 
+(deftest core-one-step
+  (let [p (c/prepare-program "
+                           g(a).
+                           f(A) :- g(A).
+                           f(b).
+                           ")]
+      (let [goal (c/parse "?- f(B).") [goals n] (c/one-step p goal)]
+        (is (= n 2))
+        (is (= goals [
+                [[[B A_1]] [(g A_1)]]
+                [[[B b]]   []]
+                ]))
+      )
+    ))
