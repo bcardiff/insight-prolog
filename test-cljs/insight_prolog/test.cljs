@@ -79,3 +79,12 @@
           ]))
   )
 
+(deftest core-incarnation
+  (is (= (c/incarnation "A" 1) "A₁"))
+  (is (= (c/incarnation "A" 456) "A₄₅₆"))
+  )
+
+(deftest core-is-candidate-rule
+  (is (c/is-candidate-rule (c/PRule. (f A) []) [(f a)]))
+  (is (not (c/is-candidate-rule (c/PRule. (g a) []) [(f a)])))
+  )

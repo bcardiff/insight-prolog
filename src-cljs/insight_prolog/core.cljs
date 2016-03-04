@@ -1,5 +1,6 @@
 (ns insight-prolog.core
-  (:require [instaparse.core :as insta]))
+  (:require [instaparse.core :as insta]
+            [clojure.string :as str]))
 
 (enable-console-print!)
 
@@ -92,3 +93,9 @@
                   ))))
           ))))))
 
+
+(defn incarnation [name num]
+  (+ name (str/replace (.toString num) #"." (fn [d] (nth "₀₁₂₃₄₅₆₇₈₉" (int d))))) )
+
+(defn is-candidate-rule [rule goal]
+  (= (:name (:lhs rule)) (:name (first goal))))
