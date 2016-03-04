@@ -13,12 +13,14 @@
 
 (defrecord PRule [lhs rhs]) ; Rules
 
+(defrecord PRuntime [program incarnation])
 
 (def grammar
   (insta/parser
-    "<S> = (<whitespace>? | axiom | rule)*
+    "<S> = (<whitespace>? | axiom | rule | goal)*
      axiom = clause <'.'>
      rule = clause <':-'> comma_clause <'.'>
+     <goal> = <'?-'> comma_clause <'.'>
      <comma_clause> = clause (<','> comma_clause)?
 
      <clause> = term
@@ -51,22 +53,29 @@
 (defmethod subst [ISeq] [s substs]
   (mapv (fn [arg] (subst arg substs)) s))
 
+(defmethod subst [LazySeq] [s substs]
+  (mapv (fn [arg] (subst arg substs)) s))
+
 (defmethod subst [PAtom] [a _]
   a)
 
 (defmethod subst [PVar] [a substs]
   (if (empty? substs)
     a
-    (let [[[v t] othersubsts] substs]
-      (if (= a v) t (subst a othersubsts)))))
+    (let [s (first (filter (fn [e] (= (first e) a)) substs))]
+      (if (nil? s) a (second s)))))
 
 (defmethod subst [PFun] [{:keys [name args]} substs]
   (PFun. name (mapv (fn [arg] (subst arg substs)) args)))
+
+(defmethod subst [PRule] [{:keys [lhs rhs]} substs]
+  (PRule. (subst lhs substs) (subst rhs substs)))
 
 (defmulti vars (fn [term] (type term)))
 (defmethod vars PAtom [_] #{})
 (defmethod vars PVar [a] #{a})
 (defmethod vars PFun [f] (set (flatten (map seq (map vars (:args f))))) )
+(defmethod vars PRule [r] (remove nil? (set (concat (vars (:lhs r)) (flatten (map seq (map vars (:rhs r))))))))
 
 (defn unify_vars [v other g]
   (if ((vars other) v)
@@ -97,5 +106,16 @@
 (defn incarnation [name num]
   (+ name (str/replace (.toString num) #"." (fn [d] (nth "₀₁₂₃₄₅₆₇₈₉" (int d))))) )
 
-(defn is-candidate-rule [rule goal]
+(defn rule-incarnation [rule num]
+  (let [vs (vars rule)
+        rule-subst (vec (map (fn [v] [v (PVar. (incarnation (:name v) num))]) vs))
+        ]
+    (subst rule rule-subst)
+    ))
+
+(defn is-candidate-rule [goal rule]
   (= (:name (:lhs rule)) (:name (first goal))))
+
+(defn prepare-program [input]
+  (PRuntime. (parse input) 0))
+

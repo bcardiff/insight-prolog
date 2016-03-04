@@ -6,7 +6,9 @@
 (defn i [a] (println a) a)
 
 (def A (c/PVar. "A"))
+(def A_2 (c/PVar. "A₂"))
 (def B (c/PVar. "B"))
+(def B_2 (c/PVar. "B₂"))
 (def a (c/PAtom. "a"))
 (def b (c/PAtom. "b"))
 (defn f [& args] (c/PFun. "f" args))
@@ -24,19 +26,27 @@
     )
 
 (deftest core-test
-  (assert (= (c/lorem) "ipsum!!!"))
-  (assert (= (:name A)  "A"))
-  (assert (= (:name a)  "a")))
+  (is (= (c/lorem) "ipsum!!!"))
+  (is (= (:name A)  "A"))
+  (is (= (:name a)  "a")))
 
 (deftest core-subst
-  (assert (= (c/subst A []) A))
-  (assert (= (c/subst (f A) [[A b]]) (f b)))
-  (assert (= (c/subst (f A B) [[B A]]) (f A A)))
-  (assert (= (c/subst a [[B A]]) a)))
+  (is (= (c/subst A []) A))
+  (is (= (c/subst (f A) [[A b]]) (f b)))
+  (is (= (c/subst (f A B) [[B A]]) (f A A)))
+  (is (= (c/subst a [[B A]]) a))
+  (is (= (c/subst (f A B) [[A a] [B b]]) (f a b)))
+  (is (= (c/subst (f A B) [[A a]]) (f a B)))
+
+  (is (= (c/subst (c/PRule. (f A) [(f B) (g a) (g A)]) [[A a]])
+             (c/PRule. (f a) [(f B) (g a) (g a)])))
+  )
 
 (deftest core-vars
-  (assert (= (c/vars B) #{B}))
-  (assert (= (c/vars (f A B)) #{A B})))
+  (is (= (c/vars B) #{B}))
+  (is (= (c/vars (f A B)) #{A B}))
+  (is (= (c/vars (c/PRule. (f A) [(f B) (g a) (g A)]) #{A B})))
+  )
 
 (deftest core-unify
   (assert_unify [[a a]] [])
@@ -82,9 +92,13 @@
 (deftest core-incarnation
   (is (= (c/incarnation "A" 1) "A₁"))
   (is (= (c/incarnation "A" 456) "A₄₅₆"))
+
+  (is (= (c/rule-incarnation (c/PRule. (f A) [(f B) (g a) (g A)]) 2)
+         (c/PRule. (f A_2) [(f B_2) (g a) (g A_2)])))
   )
 
 (deftest core-is-candidate-rule
-  (is (c/is-candidate-rule (c/PRule. (f A) []) [(f a)]))
-  (is (not (c/is-candidate-rule (c/PRule. (g a) []) [(f a)])))
+  (is (c/is-candidate-rule [(f a)] (c/PRule. (f A) [])))
+  (is (not (c/is-candidate-rule [(f a)] (c/PRule. (g a) []))))
   )
+
